@@ -1,0 +1,75 @@
+.loader {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 25px;
+  height: 25px;
+  border: 2px solid #a35139;
+  border-radius: 50%;
+  border-left-color: transparent;
+  animation: loader 1s infinite;
+}
+
+@keyframes loader {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+ol {
+  margin-left: 55px;
+}
+
+li {
+  color: #a35139;
+  background-color: #feb161;
+  margin: 10px;
+  padding: 5px;
+}
+
+input {
+  margin-right: 5px;
+  border-radius: 0;
+  outline: 0;
+}
+
+.customCheckboxInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.customCheckboxBox {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  background: #ede9de;
+  margin-right: 8px;
+  vertical-align: middle;
+  cursor: pointer;
+  position: relative;
+}
+
+.customCheckboxBox::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  content: "";
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: #a35139;
+  opacity: 0%;
+}
+
+.customCheckboxInput:checked + .customCheckboxBox::after {
+  opacity: 100%;
+}
