@@ -1,5 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import styles from "./App.module.css";
+import {
+  useRequestNewToDoItem,
+  useRequestToSort,
+  useRequestUpdateToDoItem,
+  useRequestDeleteToDoItem,
+  useRequestDebouncedGetItem,
+} from "./assets/hooks/index";
 
 export const App = () => {
   const [todos, setProducts] = useState([]);
@@ -7,6 +14,7 @@ export const App = () => {
   const inputValue = useRef(null);
   const [TodosFlag, setTodosFlag] = useState(false);
   const timerId = useRef(null);
+
   const refreshTodosFlag = () => {
     setTodosFlag(!TodosFlag);
   };
@@ -18,68 +26,28 @@ export const App = () => {
       .finally(() => setIsLoading(false));
   }, [TodosFlag]);
 
-  const requestNewToDoItem = () => {
-    setIsLoading(true);
-    if (inputValue.current.value) {
-      fetch("http://localhost:3004/todos/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json;charset=utf-8" },
-        body: JSON.stringify({
-          description: inputValue.current.value || "Пустая записка",
-          done: false,
-        }),
-      })
-        .then((inputValue.current.value = ""))
-        .then(() => refreshTodosFlag())
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
-      return;
-    }
-  };
+  const requestNewToDoItem = useRequestNewToDoItem(
+    setIsLoading,
+    inputValue,
+    refreshTodosFlag,
+  );
+  const requestToSort = useRequestToSort(setIsLoading, setProducts);
 
-  const requestUpdateToDoItem = (currentDescription, id, doneValue) => {
-    setIsLoading(true);
-    fetch(`http://localhost:3004/todos/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json;charset=utf-8" },
-      body: JSON.stringify({
-        description: currentDescription,
-        done: !doneValue,
-      }),
-    })
-      .then(() => refreshTodosFlag())
-      .finally(() => setIsLoading(false));
-  };
+  const requestUpdateToDoItem = useRequestUpdateToDoItem(
+    refreshTodosFlag,
+    setIsLoading,
+  );
 
-  const requestDeleteToDoItem = (id) => {
-    setIsLoading(true);
-    fetch(`http://localhost:3004/todos/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => refreshTodosFlag())
-      .finally(() => setIsLoading(false));
-  };
-  const requestDebouncedGetItem = () => {
-    setIsLoading(true);
-    clearTimeout(timerId.current);
-    timerId.current = setTimeout(() => {
-      fetch(
-        `http://localhost:3004/todos?description_like=${inputValue.current.value}`,
-      )
-        .then((loadedData) => loadedData.json())
-        .then((productsData) => setProducts(productsData))
-        .finally(() => setIsLoading(false));
-    }, 1000);
-  };
-
-  const requestToSort = () => {
-    setIsLoading(true);
-    fetch(`http://localhost:3004/todos?_sort=description`)
-      .then((loadedData) => loadedData.json())
-      .then((productsData) => setProducts(productsData))
-      .finally(() => setIsLoading(false));
-  };
+  const requestDeleteToDoItem = useRequestDeleteToDoItem(
+    setIsLoading,
+    refreshTodosFlag,
+  );
+  const requestDebouncedGetItem = useRequestDebouncedGetItem(
+    setIsLoading,
+    setProducts,
+    timerId,
+    inputValue,
+  );
 
   return (
     <>
