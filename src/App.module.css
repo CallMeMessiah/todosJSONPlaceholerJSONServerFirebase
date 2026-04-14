@@ -5,7 +5,7 @@
   transform: translate(-50%, -50%);
   width: 25px;
   height: 25px;
-  border: 2px solid #a35139;
+  border: 4px solid #cf9d7c;
   border-radius: 50%;
   border-left-color: transparent;
   animation: loader 1s infinite;
@@ -20,56 +20,111 @@
   }
 }
 
-ol {
-  margin-left: 55px;
+.header {
+  display: flex;
+  flex-direction: column;
+
+  padding-bottom: 10px;
 }
 
-li {
-  color: #a35139;
-  background-color: #feb161;
-  margin: 10px;
-  padding: 5px;
+.headerTitle {
+  font-size: 80px;
+  font-weight: 700;
+  line-height: 0.65;
 }
 
-input {
-  margin-right: 5px;
-  border-radius: 0;
-  outline: 0;
+.nothing {
+  padding-top: 15px;
+  font-size: 20px;
 }
 
-.customCheckboxInput {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
+.searchTodo {
+  padding-top: 0;
+  padding-left: 10px;
+  width: 60%;
+  height: 55px;
+  border-radius: 2px;
+  border: 2px solid #cf9d7c;
+  outline: none;
+  background-color: #162127;
 }
 
-.customCheckboxBox {
-  display: inline-block;
-  width: 25px;
-  height: 25px;
-  background: #ede9de;
-  margin-right: 8px;
-  vertical-align: middle;
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search {
+  display: flex;
+}
+
+.find {
+  font-weight: 200;
+  font-size: 20px;
+  width: 20%;
+  border: 0;
+  outline: none;
+  color: #162127;
+  background-color: #cf9d7c;
   cursor: pointer;
-  position: relative;
+  transition: all 0.4s ease;
 }
 
-.customCheckboxBox::after {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  content: "";
-  display: block;
-  width: 20px;
-  height: 20px;
-  background-color: #a35139;
-  opacity: 0%;
+.sort {
+  font-weight: 200;
+  font-size: 20px;
+  width: 20%;
+  border: 0;
+  outline: none;
+  color: #162127;
+  background-color: #cf9d7c;
+  cursor: pointer;
+  border-left: 2px solid #162127;
+  transition: all 0.4s ease;
 }
 
-.customCheckboxInput:checked + .customCheckboxBox::after {
-  opacity: 100%;
+.sort:hover,
+.find:hover {
+  color: #cf9d7c;
+  background-color: #162127;
+}
+
+.todoItem {
+  padding: 5px;
+  border: 1px solid #cf9d7c;
+  display: flex;
+  justify-content: space-between;
+  margin: 15px;
+  min-width: 425px;
+}
+
+.deleteDone {
+  display: flex;
+  gap: 2px;
+  flex-direction: column;
+}
+
+.deleteDoneButton {
+  height: 50%;
+  font-size: 22px;
+  background-color: #162127;
+  border: 1px solid #cf9d7c;
+  padding: 3px;
+  transition: all 0.3s ease;
+}
+
+.deleteDoneButton:hover {
+  background-color: #cf9d7c;
+  border: 1px solid #162127;
+  color: #162127;
+}
+
+.description {
+  max-width: 800px;
+}
+
+.line {
+  opacity: 0.5;
+  text-decoration: line-through;
 }
