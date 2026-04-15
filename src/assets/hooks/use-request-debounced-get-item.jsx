@@ -1,18 +1,34 @@
-export const useRequestDebouncedGetItem = (
-  setIsLoading,
-  setProducts,
-  timerId,
-  inputValue,
-) => {
-  const requestDebouncedGetItem = () => {
+import {
+  ref,
+  get,
+  query,
+  orderByChild,
+  startAt,
+  endAt,
+} from "firebase/database";
+import { db } from "../../firebase";
+
+export const useRequestDebouncedGetItem = (setIsLoading, setTodos, timerId) => {
+  const requestDebouncedGetItem = (inputValue) => {
     setIsLoading(true);
     clearTimeout(timerId.current);
     timerId.current = setTimeout(() => {
-      fetch(
-        `http://localhost:3004/todos?description_like=${inputValue.current.value}`,
-      )
-        .then((loadedData) => loadedData.json())
-        .then((productsData) => setProducts(productsData))
+      const todosDbRef = ref(db, "todos");
+      const filtredByQuery = query(
+        todosDbRef,
+        orderByChild("description"),
+        startAt(inputValue), // 2. Начинаем с searchText
+        endAt(inputValue + "\uf8ff"),
+      );
+      get(filtredByQuery)
+        .then((snapshot) => {
+          const sortedArray = [];
+          snapshot.forEach((child) => {
+            sortedArray.push({ id: child.key, ...child.val() });
+          });
+          return sortedArray;
+        })
+        .then((sortedTodos) => setTodos(sortedTodos))
         .finally(() => setIsLoading(false));
     }, 1000);
   };

@@ -1,26 +1,16 @@
-export const useRequestNewToDoItem = (
-  setIsLoading,
-  inputValue,
-  refreshTodosFlag,
-) => {
-  const requestNewToDoItem = () => {
+import { db } from "../../firebase";
+import { ref, push } from "firebase/database";
+
+export const useRequestNewToDoItem = (setIsLoading) => {
+  const requestNewToDoItem = (inputValue) => {
+    if (inputValue === "") return;
     setIsLoading(true);
-    if (inputValue.current.value) {
-      fetch("http://localhost:3004/todos/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json;charset=utf-8" },
-        body: JSON.stringify({
-          description: inputValue.current.value || "Пустая записка",
-          done: false,
-        }),
-      })
-        .then((inputValue.current.value = ""))
-        .then(() => refreshTodosFlag())
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
-      return;
-    }
+    const todosDbRef = ref(db, "todos");
+    push(todosDbRef, {
+      description: inputValue,
+      done: false,
+    });
+    setIsLoading(false);
   };
   return requestNewToDoItem;
 };

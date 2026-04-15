@@ -1,11 +1,13 @@
-export const useRequestDeleteToDoItem = (setIsLoading, refreshTodosFlag) => {
+import { db } from "../../firebase";
+import { ref, remove } from "firebase/database";
+
+export const useRequestDeleteToDoItem = (setIsLoading) => {
   const requestDeleteToDoItem = (id) => {
     setIsLoading(true);
-    fetch(`http://localhost:3004/todos/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => refreshTodosFlag())
-      .finally(() => setIsLoading(false));
+    const todosDbRef = ref(db, `todos/${id}`);
+    remove(todosDbRef).finally(() => {
+      setIsLoading(false);
+    });
   };
   return requestDeleteToDoItem;
 };

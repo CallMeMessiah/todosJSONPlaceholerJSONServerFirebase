@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from "react";
+import { ref, onValue } from "firebase/database";
+import { db } from "./firebase";
 import styles from "./App.module.css";
 import {
   useRequestNewToDoItem,
@@ -9,46 +11,39 @@ import {
 } from "./assets/hooks/index";
 
 export const App = () => {
-  const [todos, setProducts] = useState([]);
+  const [todos, setTodos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const inputValue = useRef(null);
-  const [TodosFlag, setTodosFlag] = useState(false);
   const timerId = useRef(null);
 
-  const refreshTodosFlag = () => {
-    setTodosFlag(!TodosFlag);
-  };
-
   useEffect(() => {
-    fetch("http://localhost:3004/todos/")
-      .then((loadedData) => loadedData.json())
-      .then((productsData) => setProducts(productsData))
-      .finally(() => setIsLoading(false));
-  }, [TodosFlag]);
+    const todosDbRef = ref(db, "todos");
+    return onValue(todosDbRef, (snapshot) => {
+      const loadedTodos = snapshot.val() || {};
+      const loadedTodosArr = Object.entries(loadedTodos).map(([id, value]) => ({
+        id,
+        ...value,
+      }));
+      setTodos(loadedTodosArr);
+      setIsLoading(false);
+    });
+  }, []);
 
-  const requestNewToDoItem = useRequestNewToDoItem(
-    setIsLoading,
-    inputValue,
-    refreshTodosFlag,
-  );
-  const requestToSort = useRequestToSort(setIsLoading, setProducts);
+  const requestNewToDoItem = useRequestNewToDoItem(setIsLoading, inputValue);
 
-  const requestUpdateToDoItem = useRequestUpdateToDoItem(
-    refreshTodosFlag,
-    setIsLoading,
-  );
+  const requestUpdateToDoItem = useRequestUpdateToDoItem(setIsLoading);
 
   const requestDeleteToDoItem = useRequestDeleteToDoItem(
     setIsLoading,
-    refreshTodosFlag,
-  );
-  const requestDebouncedGetItem = useRequestDebouncedGetItem(
-    setIsLoading,
-    setProducts,
-    timerId,
     inputValue,
   );
 
+  const requestDebouncedGetItem = useRequestDebouncedGetItem(
+    setIsLoading,
+    setTodos,
+    timerId,
+  );
+  const requestToSort = useRequestToSort(setIsLoading, setTodos);
   return (
     <>
       <div className={styles.container}>
@@ -59,9 +54,12 @@ export const App = () => {
               className={styles.searchTodo}
               ref={inputValue}
               type="text"
-              onChange={requestDebouncedGetItem}
+              onChange={() => requestDebouncedGetItem(inputValue.current.value)}
             />
-            <button className={styles.find} onClick={requestNewToDoItem}>
+            <button
+              className={styles.find}
+              onClick={() => requestNewToDoItem(inputValue.current.value)}
+            >
               Add
             </button>
             <button className={styles.sort} onClick={requestToSort}>
@@ -72,33 +70,27 @@ export const App = () => {
 
         {isLoading ? (
           <div className={styles.loader}></div>
-        ) : todos.length === 0 ? (
+        ) : todos?.length === 0 ? (
           <div className={styles.nothing}>Nothing to do...</div>
         ) : (
           <ul className={styles.todoItems}>
-            {todos.map((todos) => (
+            {todos.map(({ id, description, done }) => (
               <li className={styles.todoItem}>
                 <div
-                  className={`${styles.description} ${todos.done ? styles.line : ""}`}
+                  className={`${styles.description} ${done ? styles.line : ""}`}
                 >
-                  {todos.description}
+                  {description}
                 </div>
                 <div className={styles.deleteDone}>
                   <button
                     className={styles.deleteDoneButton}
-                    onClick={() =>
-                      requestUpdateToDoItem(
-                        todos.description,
-                        todos.id,
-                        todos.done,
-                      )
-                    }
+                    onClick={() => requestUpdateToDoItem(description, id, done)}
                   >
                     done
                   </button>
                   <button
                     className={styles.deleteDoneButton}
-                    onClick={() => requestDeleteToDoItem(todos.id)}
+                    onClick={() => requestDeleteToDoItem(id)}
                   >
                     delete
                   </button>

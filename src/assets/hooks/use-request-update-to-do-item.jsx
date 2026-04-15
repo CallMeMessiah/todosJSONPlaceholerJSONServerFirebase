@@ -1,16 +1,15 @@
-export const useRequestUpdateToDoItem = (refreshTodosFlag, setIsLoading) => {
+import { db } from "../../firebase";
+import { ref, set } from "firebase/database";
+
+export const useRequestUpdateToDoItem = (setIsLoading) => {
   const requestUpdateToDoItem = (currentDescription, id, doneValue) => {
     setIsLoading(true);
-    fetch(`http://localhost:3004/todos/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json;charset=utf-8" },
-      body: JSON.stringify({
-        description: currentDescription,
-        done: !doneValue,
-      }),
-    })
-      .then(() => refreshTodosFlag())
-      .finally(() => setIsLoading(false));
+    const todosDbRef = ref(db, `todos/${id}`);
+    set(todosDbRef, {
+      description: currentDescription,
+      done: !doneValue,
+    });
+    setIsLoading(false);
   };
   return requestUpdateToDoItem;
 };
